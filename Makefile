@@ -3,12 +3,12 @@ BINARY_NAME=go-semantic-release
 
 export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
 
-.PHONY: run deps sec fmt test
+.PHONY: debug deps sec fmt test
 
-all: test fmt vet sec run
+all: test fmt vet sec debug
 
-run: go.mod go.sum
-	@go run cmd/main.go
+debug: bin/$(BINARY_NAME)
+	@bin/$(BINARY_NAME) release -r https://github.com/argoproj/argo-cd.git
 
 vet:
 	@go vet ./...
@@ -25,5 +25,5 @@ go.mod:
 go.sum: go.mod
 	@go mod tidy
 
-bin/$(BINARY_NAME): go.mod go.sum cmd/*
-	@go build -o bin/$(BINARY_NAME) cmd/main.go
+bin/$(BINARY_NAME): go.mod go.sum cmd/* pkg/**/*
+	@go build -o bin/$(BINARY_NAME) cmd/cmd.go
