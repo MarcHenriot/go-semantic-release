@@ -32,6 +32,7 @@ func (vm *VersionManager) GetLatestTag() *git.Tag {
 				zap.String("Name", vm.semverTags[i].GetName()),
 				zap.Error(errI),
 			)
+			return false
 		}
 		semverj, errJ := semver.NewVersion(vm.semverTags[j].GetName())
 		if errJ != nil {
@@ -40,15 +41,9 @@ func (vm *VersionManager) GetLatestTag() *git.Tag {
 				zap.String("Name", vm.semverTags[j].GetName()),
 				zap.Error(errJ),
 			)
-		}
-		if errI == nil && errJ == nil {
-			return semverI.GreaterThan(semverj)
-		} else if errI != nil {
-			return false
-		} else if errJ != nil {
 			return true
 		}
-		return true
+		return semverI.GreaterThan(semverj)
 	})
 	return vm.semverTags[0]
 }
