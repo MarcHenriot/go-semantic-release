@@ -11,6 +11,8 @@ import (
 
 var logger *zap.Logger
 var repoURL string
+var branchName string
+var remoteName string
 
 func init() {
 	var err error
@@ -18,25 +20,26 @@ func init() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	logger.Info("logger initialized")
+	logger.Debug("logger initialized")
 
-	// Add a persistent flag for the repository URL
-	rootCmd.PersistentFlags().StringVarP(&repoURL, "repo", "r", "", "Repository URL (e.g., https://github.com/argoproj/argo-cd.git)")
-	rootCmd.MarkPersistentFlagRequired("repo")
+	rootCmd.PersistentFlags().StringVarP(&repoURL, "repo-url", "u", "", "Repository URL (e.g., https://github.com/argoproj/argo-cd.git)")
+	rootCmd.PersistentFlags().StringVarP(&branchName, "branch", "b", "main", "Branch name")
+	rootCmd.PersistentFlags().StringVarP(&remoteName, "remote", "r", "origin", "Remote name")
+	rootCmd.MarkPersistentFlagRequired("repo-url")
 }
 
 var rootCmd = &cobra.Command{
 	Use:   "go-semantic-release",
 	Short: "A CLI for semantic versioning and releasing based on commit and tag in CI",
 	Long:  `This CLI automates semantic versioning and releases based on commit messages and tags in continuous integration (CI) environments.`,
+	Args:  cobra.MinimumNArgs(1),
 }
 
 var validateCmd = &cobra.Command{
 	Use:   "validate",
 	Short: "Validate commits for semantic versioning",
 	Long:  `This command validates commits to ensure they adhere to semantic versioning conventions.`,
-	Run: func(cmd *cobra.Command, args []string) {
-	},
+	Run:   func(cmd *cobra.Command, args []string) {},
 }
 
 var releaseCmd = &cobra.Command{
@@ -44,7 +47,11 @@ var releaseCmd = &cobra.Command{
 	Short: "Create a new release based on commit messages",
 	Long:  `This command creates a new release based on commit messages and semantic versioning.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		rm := git.NewRemoteManager(repoURL, logger)
+		rm, err := git.NewRemoteManager(repoURL, branchName, remoteName, logger)
+		if err != nil {
+			logger.Error("Failed to create remote manager", zap.Error(err))
+			return
+		}
 		tags, err := rm.ListTags()
 		if err != nil {
 			logger.Error("Failed to get tags", zap.Error(err))

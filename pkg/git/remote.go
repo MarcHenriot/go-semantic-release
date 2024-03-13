@@ -2,7 +2,7 @@ package git
 
 import (
 	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/config"
+	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/storage/memory"
 	"go.uber.org/zap"
 )
@@ -10,18 +10,32 @@ import (
 type RemoteManager struct {
 	logger *zap.Logger
 	remote *git.Remote
+	repo   *git.Repository
 }
 
-func NewRemoteManager(url string, logger *zap.Logger) *RemoteManager {
+func NewRemoteManager(url, branchName, remoteName string, logger *zap.Logger) (*RemoteManager, error) {
 	logger.Info("creating tag manager", zap.String("url", url))
-	remote := git.NewRemote(memory.NewStorage(), &config.RemoteConfig{
-		Name: "origin",
-		URLs: []string{url},
+	repo, err := git.Clone(memory.NewStorage(), nil, &git.CloneOptions{
+		URL:           url,
+		RemoteName:    remoteName,
+		ReferenceName: plumbing.NewBranchReferenceName(branchName),
+		SingleBranch:  true,
+		Tags:          git.AllTags,
 	})
+	if err != nil {
+		logger.Error("failed to clone repo", zap.Error(err))
+		return nil, err
+	}
+	remote, err := repo.Remote(remoteName)
+	if err != nil {
+		logger.Error("failed to get remote", zap.Error(err))
+		return nil, err
+	}
 	return &RemoteManager{
 		logger: logger,
 		remote: remote,
-	}
+		repo:   repo,
+	}, nil
 }
 
 func (rm *RemoteManager) ListTags() (tags Tags, err error) {

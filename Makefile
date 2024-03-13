@@ -5,10 +5,13 @@ export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
 
 .PHONY: debug deps sec fmt test
 
-all: test fmt vet sec debug
+all: test fmt vet sec debug help
 
 debug: bin/$(BINARY_NAME)
-	@bin/$(BINARY_NAME) release -r https://github.com/argoproj/argo-cd.git
+	@bin/$(BINARY_NAME) release -u https://github.com/argoproj/argo-cd.git
+
+help: bin/$(BINARY_NAME)
+	@bin/$(BINARY_NAME) -h
 
 vet:
 	@go vet ./...
