@@ -8,7 +8,7 @@ export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
 all: test fmt vet sec debug help
 
 debug: bin/$(BINARY_NAME)
-	@bin/$(BINARY_NAME) release -u https://github.com/argoproj/argo-cd.git
+	@bin/$(BINARY_NAME) release -u https://github.com/argoproj/argo-cd.git -b master
 
 help: bin/$(BINARY_NAME)
 	@bin/$(BINARY_NAME) -h
