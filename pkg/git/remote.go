@@ -46,7 +46,7 @@ func (rm *RemoteManager) ListTags() (tags Tags, err error) {
 	return tags, nil
 }
 
-func (rm *RemoteManager) ListCommits() (tags []*Tag, err error) {
+func (rm *RemoteManager) ListCommits() (tags Tags, err error) {
 	refs, err := rm.remote.List(&git.ListOptions{})
 	if err != nil {
 		rm.logger.Error("failed to get refs", zap.Error(err))

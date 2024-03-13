@@ -8,7 +8,6 @@ type Tag struct {
 
 type Tags []*Tag
 
-// Constructor for Tag
 func NewTag(name string, ref string, commitSha string) *Tag {
 	return &Tag{
 		name:      name,
@@ -17,7 +16,6 @@ func NewTag(name string, ref string, commitSha string) *Tag {
 	}
 }
 
-// Getter methods
 func (t *Tag) GetName() string {
 	return t.name
 }
