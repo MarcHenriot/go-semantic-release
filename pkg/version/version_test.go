@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/MarcHenriot/go-semantic-release/pkg/git"
+	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 )
@@ -22,52 +23,52 @@ func Test_GetLatestTag(t *testing.T) {
 		{
 			name: "test all good with v",
 			tags: git.Tags{
-				git.NewTag("v1.3.0", "", ""),
-				git.NewTag("2.2.3", "", ""),
-				git.NewTag("1.3.1", "", ""),
-				git.NewTag("v1.2.3", "", ""),
+				git.NewTag("v1.3.0", "", plumbing.Hash{}),
+				git.NewTag("2.2.3", "", plumbing.Hash{}),
+				git.NewTag("1.3.1", "", plumbing.Hash{}),
+				git.NewTag("v1.2.3", "", plumbing.Hash{}),
 			},
-			expectedTag: git.NewTag("2.2.3", "", ""),
+			expectedTag: git.NewTag("2.2.3", "", plumbing.Hash{}),
 		},
 		{
 			name: "test one bad",
 			tags: git.Tags{
-				git.NewTag("v1.3.0", "", ""),
-				git.NewTag("sdfsdf", "", ""),
-				git.NewTag("1.3.1", "", ""),
-				git.NewTag("v1.2.3", "", ""),
+				git.NewTag("v1.3.0", "", plumbing.Hash{}),
+				git.NewTag("sdfsdf", "", plumbing.Hash{}),
+				git.NewTag("1.3.1", "", plumbing.Hash{}),
+				git.NewTag("v1.2.3", "", plumbing.Hash{}),
 			},
-			expectedTag: git.NewTag("1.3.1", "", ""),
+			expectedTag: git.NewTag("1.3.1", "", plumbing.Hash{}),
 		},
 		{
 			name: "test two consecutive bad",
 			tags: git.Tags{
-				git.NewTag("sdfsdf", "", ""),
-				git.NewTag("sdfsdf", "", ""),
-				git.NewTag("1.3.1", "", ""),
-				git.NewTag("v1.2.3", "", ""),
+				git.NewTag("sdfsdf", "", plumbing.Hash{}),
+				git.NewTag("sdfsdf", "", plumbing.Hash{}),
+				git.NewTag("1.3.1", "", plumbing.Hash{}),
+				git.NewTag("v1.2.3", "", plumbing.Hash{}),
 			},
-			expectedTag: git.NewTag("1.3.1", "", ""),
+			expectedTag: git.NewTag("1.3.1", "", plumbing.Hash{}),
 		},
 		{
 			name: "test one good",
 			tags: git.Tags{
-				git.NewTag("sdfsdf", "", ""),
-				git.NewTag("sdfsdf", "", ""),
-				git.NewTag("1.3.1", "", ""),
-				git.NewTag("sdfsdf", "", ""),
+				git.NewTag("sdfsdf", "", plumbing.Hash{}),
+				git.NewTag("sdfsdf", "", plumbing.Hash{}),
+				git.NewTag("1.3.1", "", plumbing.Hash{}),
+				git.NewTag("sdfsdf", "", plumbing.Hash{}),
 			},
-			expectedTag: git.NewTag("1.3.1", "", ""),
+			expectedTag: git.NewTag("1.3.1", "", plumbing.Hash{}),
 		},
 		{
 			name: "test one bad at start",
 			tags: git.Tags{
-				git.NewTag("sdfsdf", "", ""),
-				git.NewTag("0.2.3", "", ""),
-				git.NewTag("1.3.1", "", ""),
-				git.NewTag("8.9.45", "", ""),
+				git.NewTag("sdfsdf", "", plumbing.Hash{}),
+				git.NewTag("0.2.3", "", plumbing.Hash{}),
+				git.NewTag("1.3.1", "", plumbing.Hash{}),
+				git.NewTag("8.9.45", "", plumbing.Hash{}),
 			},
-			expectedTag: git.NewTag("8.9.45", "", ""),
+			expectedTag: git.NewTag("8.9.45", "", plumbing.Hash{}),
 		},
 	}
 

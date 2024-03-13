@@ -63,9 +63,9 @@ var releaseCmd = &cobra.Command{
 			"Latest tag",
 			zap.String("Name", latestTag.GetName()),
 			zap.String("Ref", latestTag.GetRef()),
-			zap.String("CommitSha", latestTag.GetCommitSha()),
 		)
-		// rm.ListCommits()
+		commits, _ := rm.ListCommitSince(latestTag)
+		logger.Info("Commits since last tag", zap.Int("Count", len(commits)))
 		// semverManager := semver.NewSemverManager(latestTag)
 		// semverManager.NextMajor()
 		// fmt.Println(semverManager.GetTag())

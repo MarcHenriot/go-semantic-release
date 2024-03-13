@@ -3,6 +3,7 @@ package git
 import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/storage/memory"
 	"go.uber.org/zap"
 )
@@ -47,7 +48,7 @@ func (rm *RemoteManager) ListTags() (tags Tags, err error) {
 	}
 	for _, ref := range refs {
 		if ref.Name().IsTag() {
-			tags = append(tags, NewTag(ref.Name().Short(), ref.Name().String(), ref.String()))
+			tags = append(tags, NewTag(ref.Name().Short(), ref.Name().String(), ref.Hash()))
 			rm.logger.Debug(
 				"found tag",
 				zap.String("name", ref.Name().Short()),
@@ -60,14 +61,22 @@ func (rm *RemoteManager) ListTags() (tags Tags, err error) {
 	return tags, nil
 }
 
-func (rm *RemoteManager) ListCommits() (tags Tags, err error) {
-	refs, err := rm.remote.List(&git.ListOptions{})
+func (rm *RemoteManager) ListCommitSince(tag *Tag) (commits Commits, err error) {
+	commit, _ := rm.repo.CommitObject(tag.GetHash())
+	tagTime := commit.Committer.When
+	head, _ := rm.repo.Head()
+	cIter, err := rm.repo.Log(&git.LogOptions{
+		From:  head.Hash(),
+		Since: &tagTime,
+	})
+	commits = make(Commits, 0)
 	if err != nil {
-		rm.logger.Error("failed to get refs", zap.Error(err))
-		return nil, err
+		return commits, err
 	}
-	for _, ref := range refs {
-		rm.logger.Info(ref.String())
-	}
-	return tags, nil
+	err = cIter.ForEach(func(c *object.Commit) error {
+		rm.logger.Info("found commit", zap.String("message", c.Message))
+		commits = append(commits, Commit(c.Message))
+		return nil
+	})
+	return commits, err
 }

@@ -1,18 +1,20 @@
 package git
 
+import "github.com/go-git/go-git/v5/plumbing"
+
 type Tag struct {
-	name      string
-	ref       string
-	commitSha string
+	hash plumbing.Hash
+	name string
+	ref  string
 }
 
 type Tags []*Tag
 
-func NewTag(name string, ref string, commitSha string) *Tag {
+func NewTag(name, ref string, hash plumbing.Hash) *Tag {
 	return &Tag{
-		name:      name,
-		ref:       ref,
-		commitSha: commitSha,
+		name: name,
+		ref:  ref,
+		hash: hash,
 	}
 }
 
@@ -24,6 +26,6 @@ func (t *Tag) GetRef() string {
 	return t.ref
 }
 
-func (t *Tag) GetCommitSha() string {
-	return t.commitSha
+func (t *Tag) GetHash() plumbing.Hash {
+	return t.hash
 }
