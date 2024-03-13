@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/MarcHenriot/go-semantic-release/pkg/git"
+	"github.com/MarcHenriot/go-semantic-release/pkg/version"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -43,14 +44,24 @@ var releaseCmd = &cobra.Command{
 	Short: "Create a new release based on commit messages",
 	Long:  `This command creates a new release based on commit messages and semantic versioning.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		tm := git.NewTagManager(repoURL, logger)
-		tags, err := tm.GetTags()
+		rm := git.NewRemoteManager(repoURL, logger)
+		tags, err := rm.ListTags()
 		if err != nil {
 			logger.Error("Failed to get tags", zap.Error(err))
 			return
 		}
-		latestTag, _ := tm.GetLatestTag(tags)
-		logger.Info("Latest tag", zap.String("Name", latestTag.Name), zap.String("Ref", latestTag.Ref), zap.String("CommitSha", latestTag.CommitSha))
+		vm := version.NewVersionManager(tags, logger)
+		latestTag := vm.GetLatestTag()
+		logger.Info(
+			"Latest tag",
+			zap.String("Name", latestTag.GetName()),
+			zap.String("Ref", latestTag.GetRef()),
+			zap.String("CommitSha", latestTag.GetCommitSha()),
+		)
+		// rm.ListCommits()
+		// semverManager := semver.NewSemverManager(latestTag)
+		// semverManager.NextMajor()
+		// fmt.Println(semverManager.GetTag())
 	},
 }
 

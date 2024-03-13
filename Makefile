@@ -17,7 +17,7 @@ fmt: go.mod go.sum
 	@go fmt ./...
 
 test:
-	go test ./...
+	go test ./... -cover
 
 go.mod:
 	@go mod init $(GIT_BASE_URL)/$(BINARY_NAME)
